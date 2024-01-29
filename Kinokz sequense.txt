@@ -1,0 +1,180 @@
+title Кино
+
+
+actor #green:0.5 Я
+participant Приложения Kino.kz
+participant Сайт Kino.kz
+participant Database Kino.kz
+participant Платежная система
+participant Кинотеатр
+
+
+alt Регистрация через Приложения
+
+  activate Я
+  Я->Приложения Kino.kz:Sign Up (Phone number or E-mail)
+  activate Приложения Kino.kz
+  Приложения Kino.kz->Приложения Kino.kz:Verification 
+  Я<--Приложения Kino.kz:Verification E-mail cod
+  Я->Приложения Kino.kz:Enters verification code
+  Приложения Kino.kz->Database Kino.kz:Create account
+  activate Database Kino.kz
+  Database Kino.kz->Database Kino.kz:Create account
+  Database Kino.kz->Приложения Kino.kz:Success create account
+  deactivate Database Kino.kz
+  Я<--Приложения Kino.kz:Success login page
+  deactivate Приложения Kino.kz
+  
+else Регистрация через Сайт
+
+  Я->Сайт Kino.kz:Sign Up (Phone number or E-mail)
+  activate Сайт Kino.kz
+  Сайт Kino.kz->Сайт Kino.kz:Verification 
+  Я<--Сайт Kino.kz:Verification E-mail cod
+  Я->Сайт Kino.kz:Enters verification code
+  Сайт Kino.kz->Database Kino.kz:Create account
+  activate Database Kino.kz
+  Database Kino.kz->Database Kino.kz:Create account
+  Database Kino.kz->Сайт Kino.kz:Success create account
+  deactivate Database Kino.kz
+  Я<--Сайт Kino.kz:Success login page
+  deactivate Сайт Kino.kz
+
+
+end
+
+
+Я->Приложения Kino.kz:Log in (Phone number or E-mail)
+activate Приложения Kino.kz
+Приложения Kino.kz->Database Kino.kz:Verification Log in
+activate Database Kino.kz
+Database Kino.kz->Database Kino.kz:Verification
+Приложения Kino.kz<--Database Kino.kz:Success
+deactivate Database Kino.kz
+Я<--Приложения Kino.kz:Success log in
+deactivate Приложения Kino.kz
+
+
+
+alt Бронирование через приложение
+
+  loop Бронирование
+    Я->Приложения Kino.kz:Выбор фильма и сеанса
+    activate Приложения Kino.kz
+    Приложения Kino.kz->Database Kino.kz:Получение списка фильмов и сеансов
+    activate Database Kino.kz
+    Database Kino.kz<--Приложения Kino.kz:Список фильмов и сеансов
+    deactivate Database Kino.kz
+    Я<--Приложения Kino.kz:Отображение списка фильмов и сеансов
+
+
+    Я->Приложения Kino.kz:Запрос доступных мест в зале
+    activate Приложения Kino.kz
+    Приложения Kino.kz->Database Kino.kz:Запрос доступных мест в зале
+    activate Database Kino.kz
+    Database Kino.kz<--Приложения Kino.kz:Доступные места в зале
+    deactivate Database Kino.kz
+    Я<--Приложения Kino.kz:Отображение мест в зале
+    deactivate Приложения Kino.kz
+
+    loop Повторение выбора мест
+
+      Я->Приложения Kino.kz:Выбор мест в зале
+      activate Приложения Kino.kz
+      Приложения Kino.kz->Приложения Kino.kz:Подтверждение выбора мест
+      Я<--Приложения Kino.kz:Успешный выбор мест в зале
+      deactivate Приложения Kino.kz
+
+    end
+
+  
+  
+    Я->>Приложения Kino.kz:Заказ билета
+    activate Приложения Kino.kz
+    Приложения Kino.kz->Database Kino.kz:Бронь билета
+    activate Database Kino.kz
+    Database Kino.kz->Кинотеатр: Общая база кинотеатров
+    activate Кинотеатр
+    Кинотеатр->Кинотеатр:бронь
+    Database Kino.kz<--Кинотеатр: Ответ базы Кинотеатров
+    Database Kino.kz<--Кинотеатр: Счет за билет
+    deactivate Кинотеатр
+    Database Kino.kz->Платежная система:Счет за билет
+    activate Платежная система
+    Приложения Kino.kz<--Database Kino.kz:Ответ базы Kino.kz
+    deactivate Приложения Kino.kz
+    Я->Платежная система:Оплата
+    Я<--Платежная система:Успешная оплата
+    deactivate Платежная система
+    deactivate Database Kino.kz
+    Я<--Приложения Kino.kz:Электронный билет
+    deactivate Приложения Kino.kz
+    
+  end
+  
+else Бронирование через Сайт
+
+  loop Бронирование
+    Я->Сайт Kino.kz:Выбор фильма и сеанса
+    activate Сайт Kino.kz
+    Сайт Kino.kz->Database Kino.kz:Получение списка фильмов и сеансов
+    activate Database Kino.kz
+    Database Kino.kz<--Сайт Kino.kz:Список фильмов и сеансов
+    deactivate Database Kino.kz
+    Я<--Сайт Kino.kz:Отображение списка фильмов и сеансов
+
+
+    Я->Сайт Kino.kz:Запрос доступных мест в зале
+    activate Сайт Kino.kz
+    Сайт Kino.kz->Database Kino.kz:Запрос доступных мест в зале
+    activate Database Kino.kz
+    Database Kino.kz<--Сайт Kino.kz:Доступные места в зале
+    deactivate Database Kino.kz
+    Я<--Сайт Kino.kz:Отображение мест в зале
+    deactivate Сайт Kino.kz
+
+    loop Повторение выбора мест
+      Я->Сайт Kino.kz:Выбор мест в зале
+      activate Сайт Kino.kz
+      Сайт Kino.kz->Сайт Kino.kz:Подтверждение выбора мест
+      Я<--Сайт Kino.kz:Успешный выбор мест в зале
+      deactivate Сайт Kino.kz
+    end
+
+
+    Я->>Сайт Kino.kz:Заказ билета
+    activate Сайт Kino.kz
+    Сайт Kino.kz->Database Kino.kz:Бронь билета
+    activate Database Kino.kz
+    Database Kino.kz->Кинотеатр: Общая база кинотеатров
+    activate Кинотеатр
+    Кинотеатр->Кинотеатр:бронь
+    Database Kino.kz<--Кинотеатр: Ответ базы Кинотеатров
+    Database Kino.kz<--Кинотеатр: Счет за билет
+    deactivate Кинотеатр
+    Database Kino.kz->Платежная система:Счет за билет
+    activate Платежная система
+    Сайт Kino.kz<--Database Kino.kz:Ответ базы Kino.kz
+    deactivate Сайт Kino.kz
+    Я->Платежная система:Оплата
+    Я<--Платежная система:Успешная оплата
+    deactivate Платежная система
+    deactivate Database Kino.kz
+    Я<--Сайт Kino.kz:Электронный билет
+    deactivate Сайт Kino.kz
+  end
+
+end
+
+
+Я->Кинотеатр:Пойду в кино
+deactivate Я
+activate Кинотеатр
+Я<--Кинотеатр:Домой
+deactivate Кинотеатр
+destroyafter Я
+
+
+
+
+
